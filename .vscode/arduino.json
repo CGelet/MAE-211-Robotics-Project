@@ -1,5 +1,6 @@
 {
     "board": "atmel-avr-xminis:avr:atmega328p_xplained_mini",
     "programmer": "medbg",
-    "port": "COM4"
+    "port": "COM4",
+    "sketch": "Arduino-Test.ino"
 }
