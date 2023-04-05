@@ -2,5 +2,5 @@
     "port": "COM3",
     "board": "atmel-avr-xminis:avr:atmega328p_xplained_mini",
     "programmer": "medbg",
-    "sketch": "Arduino-Test.ino"
+    "sketch": "MAE-211-Robotics-Project.ino"
 }
