@@ -32,18 +32,19 @@ void loop()
     if (cmd == 70)
     {
       Serial.print("Received");
-      while (cmd != 69)
+      while (true)
       {
         if (IrReceiver.decode())
         {
           IrReceiver.resume();
           Serial.println(IrReceiver.decodedIRData.command);
           int cmd = IrReceiver.decodedIRData.command;
-
-          lcd.clear();
-          lcd.print("Completed");
-          break;
-
+          if (cmd == 69)
+          {
+            lcd.clear();
+            lcd.print("Completed");
+            break;
+          }
         }
         lcd.clear();
         lcd.setCursor(0, 0);
