@@ -71,19 +71,27 @@ distanceF = durationF * 0.034 / 2;
 
 
 void forward() {
-digitalWrite()
+    digitalWrite(motorLPin, HIGH);
+    digitalWrite(motorRPin, HIGH);
 }
 
 void turnRight() {
-
+    digitalWrite(motorLPin, LOW);
+    digitalWrite(motorRPin, HIGH);
 }
 
 void turnLeft() {
-
+    digitalWrite(motorRPin, LOW);
+    digitalWrite(motorLPin, HIGH);
 }
 
 void reverse() {
-
+    digitalWrite(motorLPin, LOW);
+    digitalWrite(motorRPin, LOW);
+    digitalWrite(motorRRev, HIGH);
+    digitalWrite(motorLRev, HIGH);
+    digitalWrite(motorLPin, HIGH);
+    digitalWrite(motorRPin, HIGH);
 }
 
 void shift (){
