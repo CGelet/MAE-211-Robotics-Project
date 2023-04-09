@@ -1,6 +1,6 @@
-#include // LCD
-#include // Motors
-#include // IR Recv.
+#include <LiquidCrystal_I2C.h> // LCD
+//#include // Motors
+#include <IRremote.h> // IR Recv.
 
 LiquidCrystal_I2C lcd(0x27, 16, 2); // LCD Initialization adn Setup on 0x27 default 
 // We may want to switch this to a 7 segment display, much cheaper
@@ -32,7 +32,7 @@ const int motorRPin = ; // Right Motor Pin
 const int motorRRev = ; // Right Motor Reverse Pin
 
 void setup() {
-    serial.begin(9600); // Serial Readout is 9600
+    Serial.begin(9600); // Serial Readout is 9600
 
     pinMode(trigPin, OUTPUT); // Sensor Reception
     pinMode(echoPinL, INPUT); // Reception pin from Sens L
@@ -46,7 +46,7 @@ void setup() {
     IrReceiver.begin(irRecvPin); // Receiver enables
 
     digitalWrite(motorLRev, LOW); // Ensuring Motor Movement is Forward
-    digitalwrite(motorRRev, LOW);
+    digitalWrite(motorRRev, LOW);
 
     lcd.print('Strt Cmplt'); // May switch to 7 segment
 }
@@ -73,25 +73,38 @@ distanceF = durationF * 0.034 / 2;
 void forward() {
     digitalWrite(motorLPin, HIGH);
     digitalWrite(motorRPin, HIGH);
+    return;
 }
 
 void turnRight() {
     digitalWrite(motorLPin, LOW);
     digitalWrite(motorRPin, HIGH);
+    return;
 }
 
 void turnLeft() {
     digitalWrite(motorRPin, LOW);
     digitalWrite(motorLPin, HIGH);
+    return;
 }
 
 void reverse() {
-    digitalWrite(motorLPin, LOW);
-    digitalWrite(motorRPin, LOW);
+    stop();
     digitalWrite(motorRRev, HIGH);
     digitalWrite(motorLRev, HIGH);
-    digitalWrite(motorLPin, HIGH);
-    digitalWrite(motorRPin, HIGH);
+    delay(1000);
+    shift();
+    delay(1000);
+    digitalWrite(motorRRev, HIGH);
+    digitalWrite(motorLRev, HIGH);
+    return;
+}
+
+void stop(){
+    Serial.print('Stopped');
+    digitalWrite(motorLPin, LOW);
+    digitalWrite(motorRPin, LOW);
+    return;
 }
 
 void shift (){
@@ -118,13 +131,13 @@ void drive() {
 void loop() {
     if (IrReceiver.decode()) { // On IR Receive, decode
         IrReceiver.resume(); // resume reception
-        serial.print(IrReceiver.decodedIRData.command); // Print Reception
+        Serial.print(IrReceiver.decodedIRData.command); // Print Reception
         cmd = IrReceiver.decodedIRData.command; // Set as CMD
         if (cmd == 70) { // Check CMD for Mode Button
-            while true {  // Infinite loop to be broken if Power is pressed
+            while (true) {  // Infinite loop to be broken if Power is pressed
                 if (IrReceiver.decode()){ // IR Receiver for shutdown
                     IrReceiver.resume();
-                    serial.print(IrReceiver.decodedIRData.command);
+                    Serial.print(IrReceiver.decodedIRData.command);
                     cmd = IrReceiver.decodedIRData.command;
                     if (cmd == 69) {
                         break;
