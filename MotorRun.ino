@@ -6,7 +6,9 @@ LiquidCrystal_I2C lcd(0x27, 16, 2); // LCD Initialization adn Setup on 0x27 defa
 // We may want to switch this to a 7 segment display, much cheaper
 
 // USS Pins and Vars
-const int trigPin = ; // USS Trig Pin for all Sensors
+const int trigPinL = ; // USS Trig Pin L
+const int trigPinR = ; // USS Trig Pin R
+const int trigPinF = ; // USS Trig Pin F
 const int echoPinL = ; // USS recvPin L
 const int echoPinR = ; // USS recvPin R
 const int echoPinF = ; // USS recvPin F
@@ -53,15 +55,30 @@ void setup() {
 
 void sensDist(){ // Sensor reading
 
-digitalWrite(trigPin, LOW); 
+digitalWrite(trigPinL, LOW); 
 delayMicroseconds(2);
-digitalWrite(trigPin, HIGH);
+digitalWrite(trigPinL, HIGH);
 delayMicroseconds(10);
-digitalWrite(trigPin, LOW);
+digitalWrite(trigPinL, LOW);
 durationL = pulseIn(echoPinL, HIGH);
-durationR = pulseIn(echoPinR, HIGH);
-durationF = pulseIn(echoPinF, HIGH);
 
+delayMicroseconds(100);
+
+digitalWrite(trigPinR, LOW); 
+delayMicroseconds(2);
+digitalWrite(trigPinR, HIGH);
+delayMicroseconds(10);
+digitalWrite(trigPinR, LOW);
+durationL = pulseIn(echoPinR, HIGH);
+
+delayMicroseconds(100);
+
+digitalWrite(trigPinF, LOW); 
+delayMicroseconds(2);
+digitalWrite(trigPinF, HIGH);
+delayMicroseconds(10);
+digitalWrite(trigPinF, LOW);
+durationL = pulseIn(echoPinF, HIGH);
 
 distanceL = durationL * 0.034 / 2;
 distanceR = durationR * 0.034 / 2;
