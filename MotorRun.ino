@@ -1,17 +1,17 @@
-#include <LiquidCrystal_I2C.h> // LCD
+//#include <LiquidCrystal_I2C.h> // LCD
 //#include // Motors
 #include <IRremote.h> // IR Recv.
 
-LiquidCrystal_I2C lcd(0x27, 16, 2); // LCD Initialization adn Setup on 0x27 default 
+//LiquidCrystal_I2C lcd(0x27, 16, 2); // LCD Initialization adn Setup on 0x27 default 
 // We may want to switch this to a 7 segment display, much cheaper
 
 // USS Pins and Vars
 const int trigPinL = ; // USS Trig Pin L
-const int trigPinR = ; // USS Trig Pin R
-const int trigPinF = ; // USS Trig Pin F
+const int trigPinR = 4; // USS Trig Pin R
+const int trigPinF = 6; // USS Trig Pin F
 const int echoPinL = ; // USS recvPin L
-const int echoPinR = ; // USS recvPin R
-const int echoPinF = ; // USS recvPin F
+const int echoPinR = 3; // USS recvPin R
+const int echoPinF = 5; // USS recvPin F
 long int distance, duration;
 
 
@@ -20,14 +20,14 @@ const int minDistFront = 15; // Minimum distance before it will redirect
 const int minDistSide = 15; // Minimum distance before it will redirect
 
 // IR Receiver Pins and Vars
-const int irRecvPin = ; // IR Recieve Pin
+const int irRecvPin = 13; // IR Recieve Pin
 int cmd;
 
 // Motor Pins and Vars
-const int motorLPin = ; // Left Motor Pin
-const int motorLRev = ; // Left Motor Reverse Pin
-const int motorRPin = ; // Right Motor Pin
-const int motorRRev = ; // Right Motor Reverse Pin
+const int motorLPin = 9; // Left Motor Pin (IN1)
+const int motorLRev = 10; // Left Motor Reverse Pin (IN2)
+const int motorRPin = 11; // Right Motor Pin (IN3)
+const int motorRRev = 12; // Right Motor Reverse Pin (IN4)
 
 void setup() {
     Serial.begin(9600); // Serial Readout is 9600
@@ -43,16 +43,16 @@ void setup() {
     pinMode(echoPinR, INPUT); // Reception pin from Sens R
     pinMode(echoPinF, INPUT); // Reception pin from Sens F
 
-    lcd.init(); // LCD Initialization 
-    lcd.backlight(); // Turning on Backlight
-    lcd.clear(); // Clearing LCD
+    //lcd.init(); // LCD Initialization 
+    //lcd.backlight(); // Turning on Backlight
+    //lcd.clear(); // Clearing LCD
 
     IrReceiver.begin(irRecvPin); // Receiver enables
 
     digitalWrite(motorLRev, LOW); // Ensuring Motor Movement is Forward
     digitalWrite(motorRRev, LOW);
 
-    lcd.print('Strt Cmplt'); // May switch to 7 segment
+    //lcd.print('Strt Cmplt'); // May switch to 7 segment
 }
 
 void loop() {
@@ -108,7 +108,7 @@ long sensDist(int echo, int trigger){ // Sensor reading
 }
 
 void shift (){
-    lcd.print("Shifting Path");
+    //lcd.print("Shifting Path");
     long distanceF = sensDist(echoPinF,trigPinF);
     long distanceL = sensDist(echoPinL,trigPinL);
     long distanceR = sensDist(echoPinR,trigPinR);
@@ -149,8 +149,8 @@ void reverse() {
     delay(1000);
     shift();
     delay(1000);
-    digitalWrite(motorRRev, HIGH);
-    digitalWrite(motorLRev, HIGH);
+    digitalWrite(motorRRev, LOW);
+    digitalWrite(motorLRev, LOW);
     return;
 }
 
