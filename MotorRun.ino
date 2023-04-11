@@ -6,13 +6,13 @@
 // We may want to switch this to a 7 segment display, much cheaper
 
 // USS Pins and Vars
-const int trigPinL = ; // USS Trig Pin L
+const int trigPinL = 8; // USS Trig Pin L
 const int trigPinR = 4; // USS Trig Pin R
 const int trigPinF = 6; // USS Trig Pin F
-const int echoPinL = ; // USS recvPin L
+const int echoPinL = 7; // USS recvPin L
 const int echoPinR = 3; // USS recvPin R
 const int echoPinF = 5; // USS recvPin F
-long int distance, duration;
+int distance, duration;
 
 
 // Restriction Variables
