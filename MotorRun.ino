@@ -12,12 +12,8 @@ const int trigPinF = ; // USS Trig Pin F
 const int echoPinL = ; // USS recvPin L
 const int echoPinR = ; // USS recvPin R
 const int echoPinF = ; // USS recvPin F
-int distanceL; 
-int distanceR;
-int distanceF; 
-long durationL;
-long durationR;
-long durationF;
+long int distance, duration;
+
 
 // Restriction Variables
 const int minDistFront = 15; // Minimum distance before it will redirect
@@ -35,8 +31,14 @@ const int motorRRev = ; // Right Motor Reverse Pin
 
 void setup() {
     Serial.begin(9600); // Serial Readout is 9600
+    pinMode(motorRRev,OUTPUT);
+    pinMode(motorLRev,OUTPUT);
+    pinMode(motorRPin,OUTPUT);
+    pinMode(motorLPin,OUTPUT);
 
-    pinMode(trigPin, OUTPUT); // Sensor Reception
+    pinMode(trigPinL, OUTPUT); // Sensor Reception
+    pinMode(trigPinR, OUTPUT); // Sensor Reception
+    pinMode(trigPinF, OUTPUT); // Sensor Reception
     pinMode(echoPinL, INPUT); // Reception pin from Sens L
     pinMode(echoPinR, INPUT); // Reception pin from Sens R
     pinMode(echoPinF, INPUT); // Reception pin from Sens F
@@ -53,37 +55,72 @@ void setup() {
     lcd.print('Strt Cmplt'); // May switch to 7 segment
 }
 
-void sensDist(){ // Sensor reading
+void loop() {
+    if (IrReceiver.decode()) { // On IR Receive, decode
+        IrReceiver.resume(); // resume reception
+        Serial.print(IrReceiver.decodedIRData.command); // Print Reception
+        cmd = IrReceiver.decodedIRData.command; // Set as CMD
+        if (cmd == 70) { // Check CMD for Mode Button
+            while (true) {  // Infinite loop to be broken if Power is pressed
+                if (IrReceiver.decode()){ // IR Receiver for shutdown
+                    IrReceiver.resume();
+                    Serial.print(IrReceiver.decodedIRData.command);
+                    cmd = IrReceiver.decodedIRData.command;
+                    if (cmd == 69) {
+                        break;
+                    }
+                }
 
-digitalWrite(trigPinL, LOW); 
-delayMicroseconds(2);
-digitalWrite(trigPinL, HIGH);
-delayMicroseconds(10);
-digitalWrite(trigPinL, LOW);
-durationL = pulseIn(echoPinL, HIGH);
+                drive(); // Drive Function
+            }
+        }
+    }
+}
 
-delayMicroseconds(100);
+void drive() {
+    long distanceF = sensDist(echoPinF,trigPinF);
+    long distanceL = sensDist(echoPinL,trigPinL);
+    long distanceR = sensDist(echoPinR,trigPinR);
 
-digitalWrite(trigPinR, LOW); 
-delayMicroseconds(2);
-digitalWrite(trigPinR, HIGH);
-delayMicroseconds(10);
-digitalWrite(trigPinR, LOW);
-durationL = pulseIn(echoPinR, HIGH);
+    if (distanceF <= minDistFront || distanceL <= minDistSide || distanceL <= minDistSide) {
+        shift();
+    } else {
+        forward();
+    }
+}
 
-delayMicroseconds(100);
+long sensDist(int echo, int trigger){ // Sensor reading
+    int maxDist = 5000;
+    digitalWrite(trigger, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigger, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigger, LOW);
 
-digitalWrite(trigPinF, LOW); 
-delayMicroseconds(2);
-digitalWrite(trigPinF, HIGH);
-delayMicroseconds(10);
-digitalWrite(trigPinF, LOW);
-durationL = pulseIn(echoPinF, HIGH);
+    duration = pulseIn(echo, HIGH);
+    distance = duration * 0.034 / 2;
 
-distanceL = durationL * 0.034 / 2;
-distanceR = durationR * 0.034 / 2;
-distanceF = durationF * 0.034 / 2;
+    if (distance > maxDist)
+    {
+        distance = maxDist;
+    }
+    return distance;
+}
 
+void shift (){
+    lcd.print("Shifting Path");
+    long distanceF = sensDist(echoPinF,trigPinF);
+    long distanceL = sensDist(echoPinL,trigPinL);
+    long distanceR = sensDist(echoPinR,trigPinR);
+
+    if (distanceF > distanceL && distanceF > distanceR) {
+        forward();
+    } else if (distanceF < distanceL && distanceR < distanceL) {
+        turnLeft();
+    } else {
+        turnRight();
+    }
+    return;
 }
 
 
@@ -124,45 +161,3 @@ void stop(){
     return;
 }
 
-void shift (){
-    lcd.print("Shifting Path");
-    if (distanceF > distanceL && distanceF > distanceR) {
-        forward();
-    } else if (distanceF < distanceL && distanceR < distanceL) {
-        turnLeft();
-    } else {
-        turnRight();
-    }
-    return;
-}
-
-void drive() {
-    if (distanceF <= minDistFront || distanceL <= minDistSide || distanceL <= minDistSide) {
-        shift();
-    } else {
-        forward();
-    }
-}
-
-
-void loop() {
-    if (IrReceiver.decode()) { // On IR Receive, decode
-        IrReceiver.resume(); // resume reception
-        Serial.print(IrReceiver.decodedIRData.command); // Print Reception
-        cmd = IrReceiver.decodedIRData.command; // Set as CMD
-        if (cmd == 70) { // Check CMD for Mode Button
-            while (true) {  // Infinite loop to be broken if Power is pressed
-                if (IrReceiver.decode()){ // IR Receiver for shutdown
-                    IrReceiver.resume();
-                    Serial.print(IrReceiver.decodedIRData.command);
-                    cmd = IrReceiver.decodedIRData.command;
-                    if (cmd == 69) {
-                        break;
-                    }
-                }
-
-                drive(); // Drive Function
-            }
-        }
-    }
-}
